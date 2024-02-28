@@ -1,0 +1,51 @@
+import gym
+from stable_baselines3 import PPO
+# from pyglet.window import key
+
+def manual_control(obs):
+    # Example logic: push right if the pole is too far to the left
+    if obs[2] < -0.1:  # Angle threshold
+        return  1  # Push right
+    else:
+        return  0  # Push left
+
+
+
+
+env = gym.make('CartPole-v1', render_mode='human')
+
+
+##### TRAIN ####
+
+model = PPO("MlpPolicy", env, verbose=1)
+model.learn(total_timesteps=1000)
+
+#### EVAL ####
+
+trained_model = True
+observation, _ = env.reset()
+print(observation[2])
+
+for _ in range(1000):
+    if trained_model:
+        action, _ = model.predict(observation, deterministic=True)
+    else:
+        action = manual_control(observation)
+    observation, reward, done, info, _ = env.step(action)
+    env.render()
+    if done:
+        observation, _ = env.reset()
+
+
+#### VISUALISATION ####
+
+
+
+# # Key press handler
+# def key_press(k, mod):
+#     global action
+#     if k==key.LEFT:  action =  0  # Push cart to the left
+#     if k==key.RIGHT: action =  1  # Push cart to the right
+
+# # Attach the key press handler to the environment
+# env.viewer.window.on_key_press = key_press

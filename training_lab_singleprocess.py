@@ -63,7 +63,7 @@ nb_iteration = 1000000 # Number of time steps for learning
 
 learning_rate = 1e-3
 
-debug_info = 0  # 0 for nothing, 1 for minimum, 2 for max
+debug_info = 1  # 0 for nothing, 1 for minimum, 2 for max
 
 saving_rate = 100000 # Interval between each saves (optimal between 10000 and 100000)
 

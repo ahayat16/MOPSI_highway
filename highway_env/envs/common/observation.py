@@ -237,8 +237,8 @@ class OccupancyGridObservation(ObservationType):
     """Observe an occupancy grid of nearby vehicles."""
 
     FEATURES: List[str] = ['presence', 'vx', 'vy', 'on_road']
-    GRID_SIZE: List[List[float]] = [[-5.5*5, 5.5*5], [-5.5*5, 5.5*5]]
-    GRID_STEP: List[int] = [5, 5]
+    GRID_SIZE: List[List[float]] = [[-11*5, 11*5], [-11*5, 11*5]]
+    GRID_STEP: List[int] = [10, 10]
 
     def __init__(self,
                  env: 'AbstractEnv',
@@ -266,7 +266,7 @@ class OccupancyGridObservation(ObservationType):
         self.features = features if features is not None else self.FEATURES
         self.grid_size = np.array(grid_size) if grid_size is not None else np.array(self.GRID_SIZE)
         self.grid_step = np.array(grid_step) if grid_step is not None else np.array(self.GRID_STEP)
-        grid_shape = np.asarray(np.floor((self.grid_size[:, 1] - self.grid_size[:, 0]) / self.grid_step), dtype=np.int)
+        grid_shape = np.asarray(np.floor((self.grid_size[:, 1] - self.grid_size[:, 0]) / self.grid_step), dtype=int)
         self.grid = np.zeros((len(self.features), *grid_shape))
         self.features_range = features_range
         self.absolute = absolute
@@ -421,9 +421,9 @@ class KinematicsGoalObservation(KinematicObservation):
         try:
             obs = self.observe()
             return spaces.Dict(dict(
-                desired_goal=spaces.Box(-np.inf, np.inf, shape=obs["desired_goal"].shape, dtype=np.float64),
-                achieved_goal=spaces.Box(-np.inf, np.inf, shape=obs["achieved_goal"].shape, dtype=np.float64),
-                observation=spaces.Box(-np.inf, np.inf, shape=obs["observation"].shape, dtype=np.float64),
+                desired_goal=spaces.Box(-np.inf, np.inf, shape=obs["desired_goal"].shape, dtype=float64),
+                achieved_goal=spaces.Box(-np.inf, np.inf, shape=obs["achieved_goal"].shape, dtype=float64),
+                observation=spaces.Box(-np.inf, np.inf, shape=obs["observation"].shape, dtype=float64),
             ))
         except AttributeError:
             return spaces.Space()
@@ -455,7 +455,7 @@ class AttributesObservation(ObservationType):
         try:
             obs = self.observe()
             return spaces.Dict({
-                attribute: spaces.Box(-np.inf, np.inf, shape=obs[attribute].shape, dtype=np.float64)
+                attribute: spaces.Box(-np.inf, np.inf, shape=obs[attribute].shape, dtype=float64)
                 for attribute in self.attributes
             })
         except AttributeError:

@@ -64,7 +64,8 @@ saving_rate = 100000 # Interval between each saves (optimal between 10000 and 10
 
 comment = "__test4__" # add a comment to the name of the simulation
 
-load_from = "model/model__2022-02-26___14_25_26PPO_mopsi_highway___test2__"
+# load_from = "model/model__2022-02-26___14_25_26PPO_mopsi_highway___test2__"
+load_from = ""
 
 
 # Initialisation

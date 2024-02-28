@@ -24,7 +24,7 @@ from highway_env.envs.common.action import action_factory, Action, DiscreteMetaA
 from highway_env.envs.common.observation import observation_factory, ObservationType
 from highway_env.envs.common.finite_mdp import finite_mdp
 from highway_env.envs.common.graphics import EnvViewer
-from highway_env.vehicle.behavior import IDMVehicle, LinearVehicle
+from highway_env.vehicle.behavior import IDMVehicle, LinearVehicle, ManuallyControlledVehicle
 from highway_env.vehicle.controller import MDPVehicle
 from highway_env.vehicle.kinematics import Vehicle
 
@@ -47,7 +47,7 @@ class MopsiEnv(AbstractEnv):
             "observation": {
                 "type": "OccupancyGrid",
                 "features": ['presence','vx','vy','on_road'],
-                "grid_size": [[0, 18], [-6, 6]],
+                "grid_size": [[-18, 18], [-18, 18]],
                 "grid_step": [3, 1],
                 "align_to_vehicle_axes": True,
                 "features_range": {
@@ -63,16 +63,16 @@ class MopsiEnv(AbstractEnv):
             },
             "simulation_frequency": 15,
             "policy_frequency": 5,
-            "duration": 100,
+            "duration": 1000,
             "number_of_lane" : 1,
             "collision_reward": -5,
             "lane_centering_cost": 4,
             "action_reward": -5,
             "controlled_vehicles": 1,
-            "other_vehicles": 5,
-            "circle_radius": 100,
-            "screen_width": 1500,
-            "screen_height": 1000,
+            "other_vehicles": 10,
+            "circle_radius": 60,
+            "screen_width": 800,
+            "screen_height": 800,
             "centering_position": [0.5, 0.5],
             "lane_centering_coeff" : 5.0,
             "action_coeff" : 0.,
@@ -105,7 +105,10 @@ class MopsiEnv(AbstractEnv):
         """The episode is over when a collision occurs or when the access ramp has been passed."""
         return self.vehicle.crashed or self.steps >= self.config["duration"]
 
-    def _reset(self, config = "rl") -> None:
+    def _reset(self) -> None:
+        config = self.config.get("config_reset") or "rl"
+        print("here")
+        print(config)
         self.action_reward = {"lane_centering": 0,
                               "speed_reward": 0,
                               "action_reward": 0,
@@ -221,6 +224,7 @@ class MopsiEnv(AbstractEnv):
         """
         Populate the road with one controlled vehicle and only IDM vehicles driving on a single lane.
         """
+        print("type_vehicles", type_vehicles)
         rng = self.np_random
         nb_lane = self.config["number_of_lane"]
 
@@ -229,17 +233,23 @@ class MopsiEnv(AbstractEnv):
 
         self.controlled_vehicles = []
         for i in range(self.config["controlled_vehicles"]):
-            lane_index = ("RER", "ENPC", rng.randint(nb_lane)) if i == 0 else \
+            lane_index = ("RER", "ENPC", 0) if i == 0 else \
                 self.road.network.random_lane_index(rng)
+            # lane_index = ("RER", "ENPC", rng.randint(nb_lane)) if i == 0 else \
+            #     self.road.network.random_lane_index(rng)
 
             if type_vehicles == "sim":
                 controlled_vehicle = IDMVehicle.make_on_lane(self.road, lane_index,
-                                                             longitudinal=0. + self.road.network.get_lane(
-                                                                 lane_index).length // 2,
+                                                             longitudinal=0., #  + self.road.network.get_lane(lane_index).length // 2,
+                                                             speed=5)
+            elif type_vehicles == "manual":
+                controlled_vehicle = ManuallyControlledVehicle.make_on_lane(self.road, lane_index,
+                                                             longitudinal=0., #  + self.road.network.get_lane(lane_index).length // 2,
                                                              speed=5)
             else:
-                controlled_vehicle = self.action_type.vehicle_class.make_on_lane(self.road, lane_index, speed=5,
-                                                                             longitudinal=rng.uniform(20, 50))
+                controlled_vehicle = self.action_type.vehicle_class.make_on_lane(self.road, lane_index,
+                                                                    longitudinal=0., #  + self.road.network.get_lane(lane_index).length // 2,
+                                                                    speed=5)
             self.controlled_vehicles.append(controlled_vehicle)
             self.road.vehicles.append(controlled_vehicle)
 
@@ -248,14 +258,27 @@ class MopsiEnv(AbstractEnv):
         # 2 Front vehicles
 
         list_of_nodes = ["ENPC", "TV", "ESIEE", "RER"]
+        all_lanes_index = [("RER", "ENPC", 0),
+        ("ENPC", "TV", 1),
+        ("ENPC", "TV", 2),
+        ("ESIEE", "RER", 3)]
         init_vehicle_dist = 9
-        for lane_index in range(nb_lane) :
+        for nb_index, lane_index in enumerate(all_lanes_index[:nb_lane]):
+            print(lane_index, nb_index)
+            lane = self.road.network.get_lane(lane_index)
+            print(lane)
+            # total_len = 2*np.pi*self.config["circle_radius"]
+            len_road = 2*np.pi*self.road.network.get_lane(lane_index).radius
+            print(len_road)
+            init_vehicle_dist = len_road /(1+self.config["other_vehicles"]+self.config["controlled_vehicles"]) # veh length =5 here.
+            print(init_vehicle_dist,"init_dist")
             vehicle_nb = 0
-            for filled_street in range(len(list_of_nodes)) :
-                vehicle_on_street = 0
+            for i, filled_street in enumerate(list_of_nodes) :
+                vehicle_on_street = self.config["controlled_vehicles"] #TODO change when several lanes.
                 enough_space = True
                 while ( (vehicle_nb < self.config["other_vehicles"]) and (enough_space) ) :
-                    current_lane = (list_of_nodes[filled_street], list_of_nodes[(filled_street+1)%len(list_of_nodes)], lane_index)
+                    current_lane = (filled_street, list_of_nodes[(i+1)%len(list_of_nodes)], nb_index)
+                    print(vehicle_on_street*init_vehicle_dist)
                     vehicle = IDMVehicle.make_on_lane(self.road, current_lane,
                                                       longitudinal= 0. + vehicle_on_street*init_vehicle_dist,
                                                       speed = 5)
@@ -318,6 +341,14 @@ class MopsiEnv(AbstractEnv):
             var += (sp[i] - E)*(sp[i] - E)
         var = var/len(sp)
         return(var)
+
+    def average_speed(self) -> float:
+        """
+        :return: speed average
+        """
+        sp = self.get_speeds()
+        avg_speed = np.mean(sp)
+        return avg_speed
 
 
 register(

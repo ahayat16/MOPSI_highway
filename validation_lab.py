@@ -61,7 +61,7 @@ if __name__ == "__main__":
 
     # Configuration
     env.config["number_of_lane"] = 1
-    env.config["other_vehicles"] = 1
+    env.config["other_vehicles"] = 10
     env.config["grid_step"] = [3, 3]
     env.config["grid_size"] = [[-18, 18], [-18, 18]]
     env.config["circle_radius"] = 60

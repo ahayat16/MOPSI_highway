@@ -62,7 +62,8 @@ env.config["screen_width"] = 1000
 env.config["screen_height"] = 1000
 
 # There is no trained agent in the simulation
-env.reset("sim")
+env.config["config_reset"] = "sim"
+env.reset()
 
 #=====================================================================================
 #============================ MAIN PROGRAM ===========================================

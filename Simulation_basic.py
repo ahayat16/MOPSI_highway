@@ -30,19 +30,26 @@ import imageio
 #============================== FUNCTIONS ============================================
 #=====================================================================================
 
-def show_var_infos(vari,title="swow_var_info", dirpath = None):
+def show_var_infos(vari,title="swow_var_info", dirpath = None, average_speed = None):
     title_file = title
     fig,ax = plt.subplots()
     ax.plot(vari)
     ax.set_title("variance evolution from t=0 to t=T")
     ax.set_xlabel("Time (nb it)")
     ax.set_ylabel("variance (m/s)")
+
+    if average_speed is not None:
+        fig2,ax2 = plt.subplots()
+        ax2.plot(average_speed)
+        ax2.set_title("average speed evolution from t=0 to t=T")
+        ax2.set_xlabel("Time (nb it)")
+        ax2.set_ylabel("average speed (m/s)")
+
     if dirpath != None:
         fig.savefig(dirpath+"/"+ title_file +".png")
     plt.show()
 
 env = gym.make('mopsi-env-v0')
-
 
 #=====================================================================================
 #================== CONFIGURATION AND GLOBAL VARIABLES ===============================
@@ -50,20 +57,24 @@ env = gym.make('mopsi-env-v0')
 
 # Configuration
 env.config["number_of_lane"] = 1
-env.config["other_vehicles"] = 0
+env.config["other_vehicles"] = 12
 env.config["controlled_vehicles"] = 1
 env.config["duration"] = 1000
 env.config["circle_radius"] = 60
 
-env.config["screen_width"] = 1000
-env.config["screen_height"] = 1000
+env.config["screen_width"] = 800
+env.config["screen_height"] = 800
 
 # Saving results and data
 SAVE_SIMULATION = False
 
-# Put "sim" bellow for an IDM simulation
+# Uncomment next line "sim" below for an IDM simulation
+env.config["config_reset"] = "sim"
+
+# Uncomment next line "manual" below for a manual control
+env.config["config_reset"] = "manual"
+
 env.reset()
-#env.reset("sim")
 
 
 #=====================================================================================
@@ -74,10 +85,11 @@ if __name__ == "__main__":
 
     # Initialisation
     hist = []
+    speed_hist = []
     done = False
     nb_vehicles = env.config["other_vehicles"] + env.config["controlled_vehicles"]
     real_nb_vehicles = len(env.road.vehicles)
-    print(real_nb_vehicles)
+    # print(real_nb_vehicles)
     duration = env.config["duration"]
 
     if SAVE_SIMULATION and duration < 100:
@@ -125,6 +137,7 @@ if __name__ == "__main__":
 
         # Histogram
         hist.append(env.var_speed())
+        speed_hist.append(env.average_speed())
 
 
     # Create gif
@@ -138,8 +151,8 @@ if __name__ == "__main__":
             os.remove(filename)
 
         show_var_infos(hist[10:], "traffic_" + str(real_nb_vehicles) + "_vehicles" + "__" + str(duration) + "it__",
-                   dirpath=result_folder_path)
+                   dirpath=result_folder_path,average_speed=speed_hist)
 
-    else :
+    else:
         show_var_infos(hist[10:], "traffic_" + str(real_nb_vehicles) + "_vehicles" + "__" + str(duration) + "it__",
-                   dirpath= None)
+                   dirpath= None, average_speed=speed_hist)

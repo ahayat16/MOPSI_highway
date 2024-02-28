@@ -3,7 +3,6 @@ import os
 import numpy as np
 from stable_baselines3.common.results_plotter import ts2xy
 
-"""
 class MopsiCallback_multi_core(BaseCallback):
     def __init__(self, nb_step: int, log_dir: str, verbose: int = 1):
         super(MopsiCallback_multi_core, self).__init__(verbose)
@@ -21,7 +20,7 @@ class MopsiCallback_multi_core(BaseCallback):
             self.save_path = os.path.join(self.log_dir, 'last_save_state' + str(self.n_calls) + "it")
             self.model.save(self.save_path)
         return True
-"""
+
 
 class MopsiCallback_single_core(BaseCallback):
     def __init__(self, nb_step: int, log_dir: str, env = None, verbose: int = 1):

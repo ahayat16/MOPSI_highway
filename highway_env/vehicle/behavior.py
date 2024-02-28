@@ -490,3 +490,29 @@ class DefensiveVehicle(LinearVehicle):
     ACCELERATION_PARAMETERS = [MERGE_ACC_GAIN / ((1 - MERGE_VEL_RATIO) * MERGE_TARGET_VEL),
                                MERGE_ACC_GAIN / (MERGE_VEL_RATIO * MERGE_TARGET_VEL),
                                2.0]
+
+class ManuallyControlledVehicle(IDMVehicle):
+    """
+    A manual controller whose parameters can be tuned
+    """
+    def acceleration(self,
+                     ego_vehicle: ControlledVehicle,
+                     front_vehicle: Vehicle = None,
+                     rear_vehicle: Vehicle = None) -> float:
+        """
+        Compute an acceleration command with the Manual Controller.
+
+        :param ego_vehicle: the vehicle whose desired acceleration is to be computed.
+        :param front_vehicle: the vehicle preceding the ego-vehicle
+        :param rear_vehicle: the vehicle following the ego-vehicle
+        :return: the acceleration command for the ego-vehicle [m/s2]
+        """
+        ### TO BE UNCOMMENTED AND COMPLETED ###
+        k = 1
+        ego_target_speed = 9
+        acceleration = k*(ego_target_speed-ego_vehicle.speed)
+        if front_vehicle:
+            d = ego_vehicle.lane_distance_to(front_vehicle)
+            acceleration -= self.COMFORT_ACC_MAX * \
+               np.power(self.desired_gap(ego_vehicle, front_vehicle) / utils.not_zero(d), 2)
+        return acceleration
