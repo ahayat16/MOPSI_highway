@@ -107,8 +107,6 @@ class MopsiEnv(AbstractEnv):
 
     def _reset(self) -> None:
         config = self.config.get("config_reset") or "rl"
-        print("here")
-        print(config)
         self.action_reward = {"lane_centering": 0,
                               "speed_reward": 0,
                               "action_reward": 0,
@@ -264,21 +262,15 @@ class MopsiEnv(AbstractEnv):
         ("ESIEE", "RER", 3)]
         init_vehicle_dist = 9
         for nb_index, lane_index in enumerate(all_lanes_index[:nb_lane]):
-            print(lane_index, nb_index)
             lane = self.road.network.get_lane(lane_index)
-            print(lane)
-            # total_len = 2*np.pi*self.config["circle_radius"]
             len_road = 2*np.pi*self.road.network.get_lane(lane_index).radius
-            print(len_road)
             init_vehicle_dist = len_road /(1+self.config["other_vehicles"]+self.config["controlled_vehicles"]) # veh length =5 here.
-            print(init_vehicle_dist,"init_dist")
             vehicle_nb = 0
             for i, filled_street in enumerate(list_of_nodes) :
                 vehicle_on_street = self.config["controlled_vehicles"] #TODO change when several lanes.
                 enough_space = True
                 while ( (vehicle_nb < self.config["other_vehicles"]) and (enough_space) ) :
                     current_lane = (filled_street, list_of_nodes[(i+1)%len(list_of_nodes)], nb_index)
-                    print(vehicle_on_street*init_vehicle_dist)
                     vehicle = IDMVehicle.make_on_lane(self.road, current_lane,
                                                       longitudinal= 0. + vehicle_on_street*init_vehicle_dist,
                                                       speed = 5)

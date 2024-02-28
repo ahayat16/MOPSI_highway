@@ -57,7 +57,7 @@ env = gym.make('mopsi-env-v0')
 
 # Configuration
 env.config["number_of_lane"] = 1
-env.config["other_vehicles"] = 12
+env.config["other_vehicles"] = 17
 env.config["controlled_vehicles"] = 1
 env.config["duration"] = 1000
 env.config["circle_radius"] = 60
@@ -69,7 +69,7 @@ env.config["screen_height"] = 800
 SAVE_SIMULATION = False
 
 # Uncomment next line "sim" below for an IDM simulation
-env.config["config_reset"] = "sim"
+# env.config["config_reset"] = "sim"
 
 # Uncomment next line "manual" below for a manual control
 env.config["config_reset"] = "manual"

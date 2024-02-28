@@ -508,11 +508,8 @@ class ManuallyControlledVehicle(IDMVehicle):
         :return: the acceleration command for the ego-vehicle [m/s2]
         """
         ### TO BE UNCOMMENTED AND COMPLETED ###
-        k = 1
-        ego_target_speed = 9
-        acceleration = k*(ego_target_speed-ego_vehicle.speed)
+        # acceleration =
         if front_vehicle:
             d = ego_vehicle.lane_distance_to(front_vehicle)
-            acceleration -= self.COMFORT_ACC_MAX * \
-               np.power(self.desired_gap(ego_vehicle, front_vehicle) / utils.not_zero(d), 2)
-        return acceleration
+            # acceleration =
+        # return acceleration
