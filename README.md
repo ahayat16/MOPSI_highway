@@ -1,5 +1,1 @@
-# MOPSI_highway
-A Git repository for our MOPSI project.
-This project deals with :
-- The issue of traffic jam in a round simulation racetrack
-- The possible solution adresses by RL algorithms 
+# Code for Traffic control on a ring road with RL using Highway Env. Based on the MOPSI work of C-A. Gourio and Even Matencio.
