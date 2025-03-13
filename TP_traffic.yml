@@ -1,20 +1,20 @@
-name: envname
+name: MOPSI_highway
 channels:
   - conda-forge
   - defaults
 dependencies:
-  - bzip2=1.0.8=h93a5062_5
-  - ca-certificates=2024.2.2=hf0a4a13_0
-  - libffi=3.4.2=h3422bc3_5
-  - libsqlite=3.45.1=h091b4b1_0
-  - libzlib=1.2.13=h53f4e23_5
-  - ncurses=6.4=h463b476_2
-  - openssl=3.2.1=h0d3ecfb_0
-  - pip=24.0=pyhd8ed1ab_0
-  - python=3.8.18=h2469fbe_1_cpython
-  - readline=8.2=h92ec313_1
-  - tk=8.6.13=h5083fa2_1
-  - xz=5.2.6=h57fd34a_0
+  - bzip2=1.0.8
+  - ca-certificates=2024.2.2
+  - libffi=3.4.2
+  - libsqlite=3.45.1
+  - libzlib=1.2.13
+  - ncurses=6.4
+  - openssl=3.2.1
+  - pip=24.0
+  - python=3.8.18
+  - readline=8.2
+  - tk=8.6.13
+  - xz=5.2.6
   - pip:
       - cloudpickle==3.0.0
       - contourpy==1.1.1
